@@ -22,10 +22,11 @@ class GuiNumber : public GuiWidget
 {
 public:
 
-    GuiNumber(Framebuffer &fb, int col, int row, Color bg, const void **dig_img,
-              int num, Framebuffer::HAlign h_align = Framebuffer::HAlign::Left) :
+    GuiNumber(Framebuffer &fb, int col, int row, Color bg,
+              const PixelImageHdr *dig[], int num,
+              Framebuffer::HAlign h_align = Framebuffer::HAlign::Left) :
         GuiWidget(fb, col, row, 0, 0, bg),
-        _dig_img(dig_img),
+        _dig(dig),
         _num(num),
         _h_align(h_align),
         _col_ref(col)
@@ -36,7 +37,7 @@ public:
     {
         if (_visible) {
             // fb.write() sets _wid and _hgt to the rendered size.
-            _fb.write(_col_ref, _row, _num, _dig_img, _h_align, &_wid, &_hgt);
+            _fb.write(_col_ref, _row, _num, _dig, _h_align, &_wid, &_hgt);
 
             // Set _col based on alignment. Rendering started at:
             //   _col_ref for left alignment,
@@ -68,8 +69,8 @@ public:
 
 protected:
 
-    const void **_dig_img; // array of digit images
-    int _num;              // number to display
+    const PixelImageHdr **_dig; // array of digit images
+    int _num;                   // number to display
 
     // _col_ref is the original col passed in constructor
     // _col and _wid are changed in draw() and erase() based on alignment

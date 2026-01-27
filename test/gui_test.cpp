@@ -244,9 +244,7 @@ static void run()
     int col = (fb.width() - wid) / 2;
     int row = (fb.height() - hgt) / 2;
 
-    GuiLabel label(fb, col, row, bg_en,
-                   reinterpret_cast<const PixelImageInfo *>(&img_en),
-                   reinterpret_cast<const PixelImageInfo *>(&img_dis));
+    GuiLabel label(fb, col, row, bg_en, &img_en.hdr, &img_dis.hdr);
     label.draw();
     for (int i = 0; i < 5; i++) {
         sleep_ms(1000);
@@ -295,9 +293,7 @@ static void run()
     int col = (fb.width() - wid) / 2;
     int row = (fb.height() - hgt) / 2;
 
-    GuiLabel label(fb, col, row, bg_en,
-                   reinterpret_cast<const PixelImageInfo *>(&img_en),
-                   reinterpret_cast<const PixelImageInfo *>(&img_dis));
+    GuiLabel label(fb, col, row, bg_en, &img_en.hdr, &img_dis.hdr);
     label.draw();
     for (int i = 0; i < 5; i++) {
         sleep_ms(1000);
@@ -344,12 +340,12 @@ IMG_LIST(roboto_48, screen_fg, screen_bg)
 #undef IMG_MAKE
 #undef IMG_LIST
 
-static const PixelImageInfo *roboto_48_digit_img[10] = {
-    (PixelImageInfo *)&roboto_48_img_0, (PixelImageInfo *)&roboto_48_img_1,
-    (PixelImageInfo *)&roboto_48_img_2, (PixelImageInfo *)&roboto_48_img_3,
-    (PixelImageInfo *)&roboto_48_img_4, (PixelImageInfo *)&roboto_48_img_5,
-    (PixelImageInfo *)&roboto_48_img_6, (PixelImageInfo *)&roboto_48_img_7,
-    (PixelImageInfo *)&roboto_48_img_8, (PixelImageInfo *)&roboto_48_img_9,
+static const PixelImageHdr *roboto_48_digit_img[10] = {
+    &roboto_48_img_0.hdr, &roboto_48_img_1.hdr,
+    &roboto_48_img_2.hdr, &roboto_48_img_3.hdr,
+    &roboto_48_img_4.hdr, &roboto_48_img_5.hdr,
+    &roboto_48_img_6.hdr, &roboto_48_img_7.hdr,
+    &roboto_48_img_8.hdr, &roboto_48_img_9.hdr,
 };
 
 /////
@@ -360,9 +356,7 @@ static const PixelImageInfo *roboto_48_digit_img[10] = {
     static constexpr PixelImage<Pixel565, VAR##_wid, VAR##_hgt> VAR##_img =   \
         label_img<Pixel565, VAR##_wid, VAR##_hgt>(TXT, FNT, FG, 0,            \
                                                   Color::none(), BG);         \
-    static GuiLabel VAR(FB, (COL), (ROW), BG,                                 \
-                        reinterpret_cast<const PixelImageInfo *>(&VAR##_img), \
-                        reinterpret_cast<const PixelImageInfo *>(&VAR##_img))
+    static GuiLabel VAR(FB, (COL), (ROW), BG, &VAR##_img.hdr, &VAR##_img.hdr)
 
 /////
 
@@ -398,9 +392,8 @@ static const int row_b = row_a + s_hgt + 20;
 static const int row_c = row_b + s_hgt + 20;
 static const int row_d = row_c + s_hgt + 20;
 
-static GuiNumber n2a(fb, s_align, row_a, screen_bg,                        //
-                     reinterpret_cast<const void **>(roboto_48_digit_img), //
-                     0, HAlign::Right);
+static GuiNumber n2a(fb, s_align, row_a, screen_bg, roboto_48_digit_img, 0,
+                     HAlign::Right);
 
 static void s2a_value(intptr_t);
 
@@ -415,9 +408,8 @@ static void s2a_value(intptr_t)
     n2a.draw();
 }
 
-static GuiNumber n2b(fb, s_align, row_b, screen_bg,                        //
-                     reinterpret_cast<const void **>(roboto_48_digit_img), //
-                     0, HAlign::Left);
+static GuiNumber n2b(fb, s_align, row_b, screen_bg, roboto_48_digit_img, 0,
+                     HAlign::Left);
 
 static void s2b_value(intptr_t);
 
@@ -431,9 +423,7 @@ static void s2b_value(intptr_t)
     n2b.set_value(val);
 }
 
-static GuiNumber n2c(fb, s_align, row_c, screen_bg,                        //
-                     reinterpret_cast<const void **>(roboto_48_digit_img), //
-                     0, HAlign::Center);
+static GuiNumber n2c(fb, s_align, row_c, screen_bg, roboto_48_digit_img, 0, HAlign::Center);
 
 static void s2c_value(intptr_t);
 
@@ -494,10 +484,10 @@ static constexpr int nav_wid = fb_width / nav_cnt;
                                               nav_bg_prs); \
     \
     static GuiButton nav_##N(fb, N * fb_width / nav_cnt, 0, screen_bg, \
-        reinterpret_cast<const PixelImageInfo *>(&b##N##_img_ena), \
-        reinterpret_cast<const PixelImageInfo *>(&b##N##_img_dis), \
-        reinterpret_cast<const PixelImageInfo *>(&b##N##_img_prs), \
-        nav_click, N);
+                             &b##N##_img_ena.hdr, \
+                             &b##N##_img_dis.hdr, \
+                             &b##N##_img_prs.hdr, \
+                             nav_click, N);
 // clang-format on
 
 NAV_BUTTON(0, "PAGE 0")

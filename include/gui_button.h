@@ -27,10 +27,10 @@ class GuiButton : public GuiLabel
 {
 public:
 
-    GuiButton(Framebuffer &fb, int col, int row, Color bg,       //
-              const PixelImageInfo *img_enabled,                 //
-              const PixelImageInfo *img_disabled,                //
-              const PixelImageInfo *img_pressed,                 //
+    GuiButton(Framebuffer &fb, int col, int row, Color bg, //
+              const PixelImageHdr *img_enabled,            //
+              const PixelImageHdr *img_disabled,           //
+              const PixelImageHdr *img_pressed,            //
               void (*on_click)(intptr_t), intptr_t on_click_arg) :
         GuiLabel(fb, col, row, bg, img_enabled, img_disabled),
         _img_pressed(img_pressed),
@@ -53,7 +53,7 @@ public:
 
 protected:
 
-    const PixelImageInfo *_img_pressed;
+    const PixelImageHdr *_img_pressed;
 
 private:
 

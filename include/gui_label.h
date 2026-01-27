@@ -21,8 +21,8 @@ class GuiLabel : public GuiWidget
 public:
 
     GuiLabel(Framebuffer &fb, int col, int row, Color bg,
-             const PixelImageInfo *img_enabled,
-             const PixelImageInfo *img_disabled) :
+             const PixelImageHdr *img_enabled,
+             const PixelImageHdr *img_disabled) :
         GuiWidget(fb, col, row, img_enabled->wid, img_enabled->hgt, bg),
         _img_enabled(img_enabled),
         _img_disabled(img_disabled)
@@ -41,6 +41,6 @@ public:
 
 protected:
 
-    const PixelImageInfo *_img_enabled;
-    const PixelImageInfo *_img_disabled;
+    const PixelImageHdr *_img_enabled;
+    const PixelImageHdr *_img_disabled;
 };
