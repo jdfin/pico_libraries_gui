@@ -30,20 +30,32 @@ bool GuiButton::event(Event &event)
 
     if (event.type == Event::Type::down) {
         focus = this;
-        _pressed = true;
-        draw(); // the "pressed" image
+        bool was_pressed = _pressed;
+        if (_mode == Mode::Check)
+            _pressed = !_pressed;
+        else // Momentary or Radio
+            _pressed = true;
+        if (_pressed != was_pressed) {
+            draw();
+            if (_on_down != nullptr)
+                (*_on_down)(_on_down_arg);
+        }
     } else if (event.type == Event::Type::move) {
         assert(focus == this);
-        assert(_pressed);
     } else if (event.type == Event::Type::up) {
-        assert(_pressed);
         assert(focus == this);
         focus = nullptr;
-        _pressed = false;
-        draw(); // the "not pressed" image
-        // if the up is within the button, it's a click
-        if (contains(event.col, event.row))
-            (*_on_click)(_on_click_arg);
+        bool was_pressed = _pressed;
+        if (_mode == Mode::Momentary)
+            _pressed = false;
+        if (_pressed != was_pressed) {
+            draw();
+            if (_on_up != nullptr)
+                (*_on_up)(_on_up_arg);
+            // if the up is within the button, it's a click
+            if (_on_click != nullptr && contains(event.col, event.row))
+                (*_on_click)(_on_click_arg);
+        }
     }
     return true;
 }

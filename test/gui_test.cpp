@@ -249,10 +249,8 @@ static void run()
     for (int i = 0; i < 5; i++) {
         sleep_ms(1000);
         label.enabled(false);
-        //label.draw();
         sleep_ms(1000);
         label.enabled(true);
-        //label.draw();
     }
 }
 
@@ -263,46 +261,69 @@ namespace Button1 {
 
 static constexpr Font font = roboto_32;
 
-static constexpr char txt_en[] = "Enabled";
-static constexpr char txt_dis[] = "Disabled";
-
-static constexpr int wid_en = font.width(txt_en);
-static constexpr int wid_dis = font.width(txt_dis);
-static constexpr int wid = ((wid_en > wid_dis) ? wid_en : wid_dis) * 2;
-
-static constexpr int hgt_en = font.y_adv;
-static constexpr int hgt_dis = font.y_adv;
-static constexpr int hgt = ((hgt_en > hgt_dis) ? hgt_en : hgt_dis) * 2;
-
+static constexpr char txt[] = "Button";
+static constexpr int wid = font.width(txt) * 2;
+static constexpr int hgt = font.y_adv * 2;
+static constexpr Color screen_bg = Color::white();
 static constexpr Color fg = Color::black();
-
-static constexpr Color bg_en = Color::white();
-static constexpr Color bg_dis = Color::gray(80);
-
+static constexpr Color bg_up = Color::white();
+static constexpr Color bg_dn = Color::gray(80);
 static constexpr int brd_thk = 4;
 static constexpr Color brd_clr = fg;
 
-static constexpr PixelImage<Pixel565, wid, hgt> img_en =
-    label_img<Pixel565, wid, hgt>(txt_en, font, fg, brd_thk, brd_clr, bg_en);
+static void btn_click(int)
+{
+    printf("click!\n");
+}
 
-static constexpr PixelImage<Pixel565, wid, hgt> img_dis =
-    label_img<Pixel565, wid, hgt>(txt_dis, font, fg, brd_thk, brd_clr, bg_dis);
+static void btn_down(int)
+{
+    printf("down!\n");
+}
+
+static void btn_up(int)
+{
+    printf("up!\n");
+}
+
+static constexpr PixelImage<Pixel565, wid, hgt> img_up =
+    label_img<Pixel565, wid, hgt>(txt, font, fg, brd_thk, brd_clr, bg_up);
+
+static constexpr PixelImage<Pixel565, wid, hgt> img_dn =
+    label_img<Pixel565, wid, hgt>(txt, font, fg, brd_thk, brd_clr, bg_dn);
 
 static void run()
 {
-    int col = (fb.width() - wid) / 2;
-    int row = (fb.height() - hgt) / 2;
+    printf("(press any key to stop)\n");
 
-    GuiLabel label(fb, col, row, bg_en, &img_en.hdr, &img_dis.hdr);
-    label.draw();
-    for (int i = 0; i < 5; i++) {
-        sleep_ms(1000);
-        label.enabled(false);
-        //label.draw();
-        sleep_ms(1000);
-        label.enabled(true);
-        //label.draw();
-    }
+    GuiButton btn(fb, (fb.width() - wid) / 2, (fb.height() - hgt) / 2,
+                  screen_bg, &img_up.hdr, &img_up.hdr, &img_dn.hdr, //
+                  btn_click, 0, btn_down, 0, btn_up, 0);
+
+    btn.draw();
+
+    while (true) {
+
+        int c = stdio_getchar_timeout_us(0);
+        if (0 <= c && c <= 255)
+            break;
+
+        Touchscreen::Event event(ts.get_event());
+        if (event.type == Touchscreen::Event::Type::none)
+            continue;
+
+        // anyone have focus?
+        if (GuiWidget::focus != nullptr) {
+            // yes, send event there
+            GuiWidget::focus->event(event);
+        } else {
+            // no, see if button wants it
+            btn.event(event);
+        }
+
+    } // while (true)
+
+    printf("\n");
 }
 
 } // namespace Button1
@@ -318,6 +339,7 @@ static constexpr Color screen_bg = Color::white();
 static constexpr int page_cnt = 3;
 
 static void nav_click(int page_num);
+static void nop(int) {}
 
 ///// Use preprocessor to create an image for each digit 0-9.
 
@@ -341,21 +363,20 @@ IMG_LIST(roboto_48, screen_fg, screen_bg)
 #undef IMG_LIST
 
 static const PixelImageHdr *roboto_48_digit_img[10] = {
-    &roboto_48_img_0.hdr, &roboto_48_img_1.hdr,
-    &roboto_48_img_2.hdr, &roboto_48_img_3.hdr,
-    &roboto_48_img_4.hdr, &roboto_48_img_5.hdr,
-    &roboto_48_img_6.hdr, &roboto_48_img_7.hdr,
-    &roboto_48_img_8.hdr, &roboto_48_img_9.hdr,
+    &roboto_48_img_0.hdr, &roboto_48_img_1.hdr, &roboto_48_img_2.hdr,
+    &roboto_48_img_3.hdr, &roboto_48_img_4.hdr, &roboto_48_img_5.hdr,
+    &roboto_48_img_6.hdr, &roboto_48_img_7.hdr, &roboto_48_img_8.hdr,
+    &roboto_48_img_9.hdr,
 };
 
 /////
 
-#define GUI_LABEL(FB, VAR, TXT, FNT, WID, HGT, COL, ROW, FG, BG)              \
-    static constexpr int VAR##_wid = (WID != 0 ? WID : FNT.width(TXT));       \
-    static constexpr int VAR##_hgt = (HGT != 0 ? HGT : FNT.y_adv);            \
-    static constexpr PixelImage<Pixel565, VAR##_wid, VAR##_hgt> VAR##_img =   \
-        label_img<Pixel565, VAR##_wid, VAR##_hgt>(TXT, FNT, FG, 0,            \
-                                                  Color::none(), BG);         \
+#define GUI_LABEL(FB, VAR, TXT, FNT, WID, HGT, COL, ROW, FG, BG)            \
+    static constexpr int VAR##_wid = (WID != 0 ? WID : FNT.width(TXT));     \
+    static constexpr int VAR##_hgt = (HGT != 0 ? HGT : FNT.y_adv);          \
+    static constexpr PixelImage<Pixel565, VAR##_wid, VAR##_hgt> VAR##_img = \
+        label_img<Pixel565, VAR##_wid, VAR##_hgt>(TXT, FNT, FG, 0,          \
+                                                  Color::none(), BG);       \
     static GuiLabel VAR(FB, (COL), (ROW), BG, &VAR##_img.hdr, &VAR##_img.hdr)
 
 /////
@@ -423,7 +444,8 @@ static void s2b_value(intptr_t)
     n2b.set_value(val);
 }
 
-static GuiNumber n2c(fb, s_align, row_c, screen_bg, roboto_48_digit_img, 0, HAlign::Center);
+static GuiNumber n2c(fb, s_align, row_c, screen_bg, roboto_48_digit_img, 0,
+                     HAlign::Center);
 
 static void s2c_value(intptr_t);
 
@@ -487,12 +509,14 @@ static constexpr int nav_wid = fb_width / nav_cnt;
                              &b##N##_img_ena.hdr, \
                              &b##N##_img_dis.hdr, \
                              &b##N##_img_prs.hdr, \
-                             nav_click, N);
+                             nav_click, N, nop, 0, nop, 0);
 // clang-format on
 
 NAV_BUTTON(0, "PAGE 0")
 NAV_BUTTON(1, "PAGE 1")
 NAV_BUTTON(2, "PAGE 2")
+
+#undef NAV_BUTTON
 
 static GuiButton *navs[] = {&nav_0, &nav_1, &nav_2};
 

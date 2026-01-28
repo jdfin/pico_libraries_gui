@@ -28,7 +28,7 @@ public:
 
 private:
 
-    static const size_t max_widgets = 8;
+    static const size_t max_widgets = 20;
     std::array<GuiWidget *, max_widgets> _widgets;
     unsigned _widget_cnt;
     bool _visible;
