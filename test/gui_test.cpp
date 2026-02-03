@@ -279,6 +279,8 @@ static void run()
         if (event.type == Touchscreen::Event::Type::none)
             continue;
 
+        printf("%s at (%d,%d)\n", event.type_name(), event.col, event.row);
+
         // anyone have focus?
         if (GuiWidget::focus != nullptr) {
             // yes, send event there
@@ -287,6 +289,8 @@ static void run()
             // no, see if button wants it
             btn.event(event);
         }
+
+        sleep_ms(100); // slow down the prints a bit
 
     } // while (true)
 

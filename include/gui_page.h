@@ -20,6 +20,16 @@ public:
 
     void visible(bool v);
 
+    int busy() const
+    {
+        return _busy;
+    }
+
+    void busy(int b)
+    {
+        _busy = b;
+    }
+
     void draw() const;
 
     void erase() const;
@@ -36,10 +46,11 @@ public:
 
 private:
 
-    static const size_t max_widgets = 20;
+    static const size_t max_widgets = 30;
     std::array<GuiWidget *, max_widgets> _widgets;
     unsigned _widget_cnt;
     bool _visible;
+    int _busy;
     void (*_on_update)(intptr_t);
     intptr_t _on_update_arg;
 };

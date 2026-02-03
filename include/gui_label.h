@@ -22,8 +22,9 @@ public:
 
     GuiLabel(Framebuffer &fb, int col, int row, Color bg,
              const PixelImageHdr *img_enabled,
-             const PixelImageHdr *img_disabled) :
-        GuiWidget(fb, col, row, img_enabled->wid, img_enabled->hgt, bg),
+             const PixelImageHdr *img_disabled, bool visible = true) :
+        GuiWidget(fb, col, row, img_enabled->wid, img_enabled->hgt, bg,
+                  visible),
         _img_enabled(img_enabled),
         _img_disabled(img_disabled)
     {

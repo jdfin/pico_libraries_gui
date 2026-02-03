@@ -24,8 +24,9 @@ public:
 
     GuiNumber(Framebuffer &fb, int col, int row, Color bg,
               const PixelImageHdr *dig[], int num,
-              Framebuffer::HAlign h_align = Framebuffer::HAlign::Left) :
-        GuiWidget(fb, col, row, 0, 0, bg),
+              Framebuffer::HAlign h_align = Framebuffer::HAlign::Left,
+              bool visible = true, bool enabled = true) :
+        GuiWidget(fb, col, row, 0, 0, bg, visible, enabled),
         _dig(dig),
         _num(num),
         _h_align(h_align),
@@ -35,7 +36,7 @@ public:
 
     virtual void draw() override
     {
-        if (_visible) {
+        if (_visible && _num != unset) {
             // fb.write() sets _wid and _hgt to the rendered size.
             _fb.write(_col_ref, _row, _num, _dig, _h_align, &_wid, &_hgt);
 
@@ -58,7 +59,12 @@ public:
         if (_num != n) {
             erase();
             _num = n;
-            draw();
+            if (_num == unset) {
+                _wid = 0;
+                _hgt = 0;
+            } else {
+                draw();
+            }
         }
     }
 
@@ -66,6 +72,8 @@ public:
     {
         return _num;
     }
+
+    static const int unset = INT_MAX;
 
 protected:
 

@@ -31,6 +31,11 @@ public:
         _visible = v;
     }
 
+    bool visible() const
+    {
+        return _visible;
+    }
+
     // On the first call, force_draw can be used to force drawing.
     // It shouldn't be needed after that; the widget will be drawn if the
     // enable state changes.

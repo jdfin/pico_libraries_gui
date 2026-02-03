@@ -40,10 +40,13 @@ bool GuiButton::event(Event &event)
             if (_on_down != nullptr)
                 (*_on_down)(_on_down_arg);
         }
+    } else if (focus != this) {
+        // If a touch starts outside a widget and slides into it, the widget
+        // does not get the down, but will get a move (and up) even though it
+        // does not have focus. In this case, we ignore the move and up.
     } else if (event.type == Event::Type::move) {
-        assert(focus == this);
+        // ignore
     } else if (event.type == Event::Type::up) {
-        assert(focus == this);
         focus = nullptr;
         bool was_pressed = _pressed;
         if (_mode == Mode::Momentary)
@@ -57,5 +60,6 @@ bool GuiButton::event(Event &event)
                 (*_on_click)(_on_click_arg);
         }
     }
+
     return true;
 }

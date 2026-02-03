@@ -14,6 +14,7 @@ GuiPage::GuiPage(std::initializer_list<GuiWidget *> widgets,
     _widgets{},
     _widget_cnt(0),
     _visible(false),
+    _busy(0),
     _on_update(on_update),
     _on_update_arg(on_update_arg)
 {
