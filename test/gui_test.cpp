@@ -17,7 +17,7 @@
 #include "pixel_565.h"
 #include "pixel_image.h"
 #include "roboto.h"
-#include "st7796.h"
+#include "ws35.h"
 // touchscreen
 #include "gt911.h"
 // gui
@@ -44,11 +44,12 @@ static const uint8_t ts_i2c_addr = 0x14; // 0x14 or 0x5d
 static const int work_bytes = 128;
 static uint8_t work[work_bytes];
 
-static St7796 fb(fb_spi_inst, fb_spi_miso_gpio, fb_spi_mosi_gpio,
-                 fb_spi_clk_gpio, fb_spi_cs_gpio, spi_baud_request, fb_cd_gpio,
-                 fb_rst_gpio, fb_led_gpio, 480, 320, work, work_bytes);
+static Ws35 fb(fb_spi_inst, fb_spi_miso_gpio, fb_spi_mosi_gpio, fb_spi_clk_gpio,
+               fb_spi_cs_gpio, spi_baud_request, fb_cd_gpio, fb_rst_gpio,
+               fb_led_gpio, 480, 320, work, work_bytes);
 
-static I2cDev i2c_dev(ts_i2c_inst, ts_i2c_scl_gpio, ts_i2c_sda_gpio, ts_i2c_baud_request);
+static I2cDev i2c_dev(ts_i2c_inst, ts_i2c_scl_gpio, ts_i2c_sda_gpio,
+                      ts_i2c_baud_request);
 
 static Gt911 ts(i2c_dev, ts_i2c_addr, ts_rst_gpio, ts_int_gpio);
 
